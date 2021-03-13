@@ -1,6 +1,6 @@
 import { render, Component } from 'inferno';
-import LocalCall from 'LocalCall';
-import RemoteCall from 'RemoteCall';
+import LocalCall from './LocalCall.jsx';
+import RemoteCall from './RemoteCall.jsx';
 
 class App extends Component {
     constructor(props) {
@@ -12,8 +12,8 @@ class App extends Component {
     render() {
         return (
             <div>
+                <div class="Header"></div>
                 <LocalCall />
-                <RemoteCall />
             </div>
         )
     }
