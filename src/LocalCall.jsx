@@ -181,7 +181,6 @@ class LocalCall extends Component {
             };
 
             let connectBlob = JSON.stringify(connectData);
-            console.log('OFFER BLOB', connectBlob);
 
             this.setState({
                 offer: offer,
@@ -214,8 +213,8 @@ class LocalCall extends Component {
                         <span>Camera</span>
                     </label>
                     <br />
-                    <input type="button" value="Start call" onClick={this.startCall}/>
-                    <input type="button" value="Recieve call" onClick={this.startCall}/>
+                    <input type="button" value="Start call" disabled={!this.state.startedCapture} onClick={this.startCall}/>
+                    <input type="button" value="Recieve call" disabled={!this.state.startedCapture} onClick={this.startCall}/>
                     <label>
                         <p>Caller offer</p>
                         <textarea ref={this.localBlobEl} disabled={!this.state.startedCapture}>{this.state.connectBlob}</textarea>
@@ -227,7 +226,7 @@ class LocalCall extends Component {
                 </div>
 
                 <div>
-                    <h2 class="h2">Remote video</h2>
+                    <h2 class="h2">Remote</h2>
                     <video id="remote_video" controls autoplay style={{width: '400px'}} ref={this.remoteVideoEl}></video>
                 </div>
 
