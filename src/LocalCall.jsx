@@ -22,6 +22,7 @@ class LocalCall extends Component {
             answer: null,
             connectBlob: null,
             answerBlob: null,
+            captureType: "screen",
 
             started: false,
             videoSrc: null,
@@ -50,7 +51,14 @@ class LocalCall extends Component {
         };
 
         let stream;
-        stream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+        if (this.state.captureType === 'screen') {
+            stream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+        }
+        else if (this.state.captureType === 'camera') {
+            const constraints = { audio: true, video: true };
+            stream = await navigator.mediaDevices.getUserMedia(constraints);
+        }
+
         this.localStream = stream;
         this.localVideoEl.current.srcObject = stream;
         this.setState({ startedCapture: true });
@@ -183,66 +191,28 @@ class LocalCall extends Component {
         }
     }
 
-    async _updateRemote() {
-        const remoteBlobEl = document.querySelector('#remote_blob');
-        let json = remoteBlobEl.value;
-
-        let parsed = JSON.parse(json);
-        console.log('Parsed', parsed);
-
-        const desc = new RTCSessionDescription(parsed.offer);
-        let setRemote = await this.conn.setRemoteDescription(desc);
-        console.log('SET REMOTE', setRemote);
-
-        parsed.ice.forEach((ice) => {
-            const candidate = new RTCIceCandidate(ice);
-            this.conn.addIceCandidate(candidate);
-        });
-    }
-
     render() {
-        // if (!this.state.user_type) {
-        //     return (
-        //         <div>
-        //             <p>Are you starting or receiving a call?</p>
-        //             <button onclick={() => this.setState({ user_type: USER_TYPE_START })}>
-        //                 Starter
-        //             </button>
-        //             <br />
-        //             <button onclick={() => this.setState({ user_type: USER_TYPE_RECV })}>
-        //                 Receiver
-        //             </button>
-        //         </div>
-        //     )
-        // }
-
-        // if (this.state.user_type === USER_TYPE_START) {
-        //     if (this.state.offer && this.state.ice.length > 0) {
-        //         if (!this.state.connectBlob) {
-        //             const connectData = {
-        //                 offer: this.state.offer,
-        //                 ice: this.state.ice,
-        //             };
-
-        //             let connectBlob = JSON.stringify(connectData);
-        //             connectBlob = Pako.deflate(JSON.stringify(connectBlob));
-        //             connectBlob = window.btoa(connectBlob);
-        //             this.setState({connectBlob});
-        //         }
-        //     }
-
-        //     return (
-        //     )
-        // }
 
         return (
             <div>
 
                 <div>
                     <h2 class="h2">Local Call</h2>
-                    <video id="local_video" controls autoplay style={{width: '400px'}} ref={this.localVideoEl}></video>
+                    <video id="local_video" controls autoplay muted style={{width: '400px'}} ref={this.localVideoEl}></video>
                     <br />
                     <input type="button" value="Start capture" disabled={this.state.startedCapture} onClick={this.startCapture} />
+                    <label>
+                        <input type="radio" name="captureType" value="screen"  onClick={() => {
+                            this.setState({captureType: "screen"})
+                        }} checked={this.state.captureType === "screen"} />
+                        <span>Screen</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="captureType" value="camera" onClick={() => {
+                            this.setState({captureType: "camera"})
+                        }} checked={this.state.captureType === "camera"} />
+                        <span>Camera</span>
+                    </label>
                     <br />
                     <input type="button" value="Start call" onClick={this.startCall}/>
                     <input type="button" value="Recieve call" onClick={this.startCall}/>
